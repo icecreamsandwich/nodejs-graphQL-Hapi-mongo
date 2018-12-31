@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "hapi": "^17.8.1"
+    "hapi": "^17.8.1",
+    "nodemon": "^1.18.9"
   },
   "scripts": {
     "start": "nodemon index.js"
