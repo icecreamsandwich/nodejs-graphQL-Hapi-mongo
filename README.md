@@ -1,5 +1,5 @@
 # nodejs-graphql-hapi-mongo
-  Nodejs application using Hapi APi server and GraphQl interface
+  Nodejs API implementation using Hapi framework and GraphQl interface
 # pre requisites
   mongodb
 # running the application
