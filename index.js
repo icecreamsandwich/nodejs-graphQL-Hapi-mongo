@@ -1,10 +1,25 @@
 const hapi = require('hapi');
 const mongoose = require('mongoose');
+const { createStore, applyMiddleware } = require('redux');
+// removing graphqlHapi and graphiqlHapi and using inbuilt apollo server utility
+//const { graphqlHapi, graphiqlHapi } = require('apollo-server-hapi');
+const { ApolloServer } = require("apollo-server-hapi");
+const schema = require('./graphql/schema');
 const Painting = require('./models/Painting');
 
-const server = hapi.server({
+/* swagger section */
+const Inert = require('inert');
+const Vision = require('vision');
+const HapiSwagger = require('hapi-swagger');
+const Pack = require('./package');
+
+const server = new ApolloServer({
+    schema
+  });
+
+const app = hapi.server({
     port: 4000,
-    host: 'localhost'
+    host: '192.168.1.106'
 });
 
 // connect to mongodb
@@ -18,9 +33,24 @@ mongoose.connect(
 );
 
 const init = async () => {
-    await server.start();
-    console.log(`server is running at :${server.info.uri}`)
-    server.route([
+   //Registerting swagger plugins for Hapi
+    await app.register([
+		Inert,
+		Vision,
+		{
+			plugin: HapiSwagger,
+			options: {
+				info: {
+					title: 'Paintings API Documentation',
+					version: Pack.version
+				}
+			}
+		}
+    ]);
+    
+
+    //API routes
+    app.route([
         {
             method: "GET",
             path: '/',
@@ -31,6 +61,10 @@ const init = async () => {
         {
             method: "GET",
             path: '/api/v1/paintings',
+            config :{
+                description : 'Get all the paintings',
+                tags : ['api','v1','paitings']
+            },
             handler: (req, reply) => {
               return Painting.find();
             }
@@ -38,6 +72,10 @@ const init = async () => {
         {
             method: "POST",
             path: '/api/v1/paintings',
+            config :{
+                description : 'Save the paintings',
+                tags : ['api','v1','paintings']
+            },
             handler:  (req, reply) =>  {
                 const {name, url, techniques} = req.payload;
                 const painting = new Painting({
@@ -49,6 +87,17 @@ const init = async () => {
             }
         }
     ]);
+    //starting the server
+    await server.applyMiddleware({app});
+    await app.start();
+    console.log(`server is running at :${app.info.uri}`)
 };
+
+process.on('unHandledRejection', (err) => {
+	if (err) {
+		console.log(err);
+		process.exit(1);
+	}
+});
 
 init();
