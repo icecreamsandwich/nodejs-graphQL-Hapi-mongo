@@ -5,7 +5,9 @@ const { createStore, applyMiddleware } = require('redux');
 //const { graphqlHapi, graphiqlHapi } = require('apollo-server-hapi');
 const { ApolloServer } = require("apollo-server-hapi");
 const schema = require('./graphql/schema');
+//initialize models
 const Painting = require('./models/Painting');
+const User = require('./models/User');
 
 /* swagger section */
 const Inert = require('inert');
@@ -33,7 +35,7 @@ mongoose.connect(
 );
 
 const init = async () => {
-   //Registerting swagger plugins for Hapi
+   //Registering swagger plugins for Hapi
     await app.register([
 		Inert,
 		Vision,
@@ -85,7 +87,37 @@ const init = async () => {
                 })
                 return painting.save();
             }
-        }
+        },
+        {
+            method: "POST",
+            path: '/api/v1/user',
+            config :{
+                description : 'Save the user',
+                tags : ['api','v1','user']
+            },
+            handler:  (req, reply) =>  {
+                const {firstname, lastname, email, phone, grade} = req.payload;
+                const user = new User({
+                    firstname,
+                    lastname,
+                    email,
+                    phone,
+                    grade
+                })
+                return user.save();
+            }
+        },
+        {
+            method: "GET",
+            path: '/api/v1/user',
+            config :{
+                description : 'Get all the users',
+                tags : ['api','v1','user']
+            },
+            handler: (req, reply) => {
+              return User.find();
+            }
+        },
     ]);
     //starting the server
     await server.applyMiddleware({app});
