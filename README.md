@@ -4,7 +4,7 @@
   nodejs `version >= 8` <br>
   mongodb <br>
 # running the application
-a) Clone the repository `git clone https://github.com/icecreamsandwich/nodejs-graphql-hapi-mongo.git` <br>
+a) Clone the repository `git clone https://github.com/icecreamsandwich/nodejs-graphQL-Hapi-mongo.git` <br>
 b) install all the dependecies : `npm install --save` <br>
 c) start the server : `npm run start` <br>
 
